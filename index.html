@@ -1,0 +1,373 @@
+bash
+
+cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BusinessTone — Professional Communication Tool by Sakthy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#1a1a2e;--ink-light:#4a4a6a;--surface:#f7f6f3;--card:#fff;
+  --accent:#3d5a80;--accent-warm:#c47a3a;--accent-pale:#e8f0f8;
+  --border:#e0ddd8;--success:#2d7a4f;--success-pale:#eaf4ee;
+  --warn-bg:#fff8e8;--warn-border:#f0d070;--warn-text:#b07800;
+  --error:#c0392b;--radius:10px;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;line-height:1.6;}
+
+/* HEADER */
+header{background:var(--ink);color:#fff;padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-size:16px;font-weight:600;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-warm);display:inline-block;}
+.badge{font-size:11px;background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;color:rgba(255,255,255,.65);letter-spacing:.5px;font-family:monospace;}
+
+/* HERO */
+.hero{padding:40px 28px 24px;max-width:820px;margin:0 auto;}
+.hero-tag{font-size:11px;color:var(--accent-warm);letter-spacing:1.5px;text-transform:uppercase;font-family:monospace;margin-bottom:12px;}
+.hero h1{font-size:clamp(22px,3.5vw,32px);font-weight:600;line-height:1.2;letter-spacing:-.6px;margin-bottom:10px;}
+.hero h1 span{color:var(--accent);}
+.hero p{font-size:15px;color:var(--ink-light);font-weight:300;max-width:480px;}
+
+/* MAIN */
+main{max-width:820px;margin:0 auto;padding:0 28px 56px;}
+.section-label{font-size:11px;font-weight:500;color:var(--ink-light);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:block;}
+
+/* CONTROLS */
+.controls-row{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+.control-group{display:flex;flex-direction:column;flex:1;min-width:130px;}
+select{font-family:inherit;font-size:14px;border:1.5px solid var(--border);border-radius:8px;padding:9px 32px 9px 12px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a4a6a'/%3E%3C/svg%3E") no-repeat right 12px center;color:var(--ink);cursor:pointer;appearance:none;}
+select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+
+/* TONE CHIPS */
+.tone-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.chip{padding:6px 15px;border-radius:20px;border:1.5px solid var(--border);font-size:13px;cursor:pointer;background:#fff;color:var(--ink);font-family:inherit;font-weight:400;transition:all .12s;}
+.chip:hover{border-color:var(--accent);color:var(--accent);}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;}
+
+/* WORKSPACE */
+.workspace{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:580px){.workspace{grid-template-columns:1fr;}}
+.panel{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.panel-head.input-head{background:#fafaf8;}
+.panel-head.output-head{background:var(--accent-pale);}
+.panel-label{font-size:11px;font-weight:500;color:var(--ink-light);text-transform:uppercase;letter-spacing:.5px;}
+.char-count{font-size:11px;color:#9a9aaa;font-family:monospace;}
+textarea{font-family:inherit;font-size:14px;line-height:1.65;width:100%;border:none;padding:14px;resize:vertical;min-height:170px;color:var(--ink);background:#fff;outline:none;}
+.output-area{padding:14px;min-height:170px;font-size:14px;line-height:1.65;color:var(--ink);white-space:pre-wrap;}
+.placeholder{color:#b0b0c0;font-style:italic;}
+
+/* ACTIONS */
+.action-row{display:flex;gap:10px;align-items:center;margin-bottom:16px;}
+.btn-run{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 24px;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s;}
+.btn-run:hover{background:#2e4568;}
+.btn-run:disabled{background:#9aabb8;cursor:not-allowed;}
+.btn-copy{background:transparent;border:1.5px solid var(--border);border-radius:8px;padding:10px 18px;font-family:inherit;font-size:13px;color:var(--ink-light);cursor:pointer;transition:all .15s;display:none;}
+.btn-copy:hover{border-color:var(--accent);color:var(--accent);}
+.btn-copy.copied{border-color:var(--success);color:var(--success);background:var(--success-pale);}
+
+/* SPINNER */
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TYPO BANNER */
+.typo-banner{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;display:none;}
+.typo-banner.visible{display:block;}
+.typo-title{font-weight:600;color:var(--warn-text);display:block;margin-bottom:6px;}
+.typo-list{padding-left:18px;display:flex;flex-direction:column;gap:4px;color:#5a4000;}
+.typo-list li{font-family:monospace;font-size:13px;}
+.typo-note{margin-top:8px;color:#7a5800;font-size:12.5px;}
+
+/* EXPLAIN CARD */
+.explain-card{background:var(--accent-pale);border:1px solid #c0d4e8;border-radius:var(--radius);padding:16px;font-size:13.5px;line-height:1.6;margin-bottom:24px;display:none;}
+.explain-card.visible{display:block;}
+.explain-title{font-weight:600;color:var(--accent);display:block;margin-bottom:10px;}
+.explain-list{padding-left:18px;display:flex;flex-direction:column;gap:5px;}
+
+/* EXAMPLES */
+.examples{margin-top:28px;padding-top:24px;border-top:1px solid var(--border);}
+.examples-title{font-size:11px;font-weight:500;color:var(--ink-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.example-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.example-pill{padding:7px 14px;border-radius:8px;background:#fff;border:1px solid var(--border);font-size:13px;cursor:pointer;color:var(--ink-light);font-family:inherit;transition:all .15s;}
+.example-pill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-pale);}
+
+/* FOOTER */
+footer{text-align:center;padding:20px 28px;font-size:12px;color:#9a9aaa;border-top:1px solid var(--border);}
+.footer-tag{display:inline-block;font-family:monospace;background:var(--ink);color:rgba(255,255,255,.7);padding:2px 9px;border-radius:4px;font-size:11px;margin-top:5px;}
+.error-text{color:var(--error);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="logo-dot"></span>BusinessTone</div>
+  <span class="badge">AI Communication Tool</span>
+</header>
+
+<div class="hero">
+  <div class="hero-tag">Portfolio Project · Sakthy · Communication &amp; Management</div>
+  <h1>Turn any message into<br><span>professional business language</span></h1>
+  <p>Paste your draft — in English or German — and get a rewritten version that's clear, polished, and workplace-ready.</p>
+</div>
+
+<main>
+
+  <div class="controls-row">
+    <div class="control-group">
+      <span class="section-label">Input Language</span>
+      <select id="inputLang">
+        <option value="auto">Auto-detect</option>
+        <option value="English">English</option>
+        <option value="German">German (Deutsch)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <span class="section-label">Output Language</span>
+      <select id="outputLang">
+        <option value="English">English</option>
+        <option value="German">German (Deutsch)</option>
+        <option value="both">Both languages</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <span class="section-label">Context</span>
+      <select id="context">
+        <option value="general business">General Business</option>
+        <option value="job application">Job Application</option>
+        <option value="customer service">Customer Service</option>
+        <option value="internal team">Internal Team</option>
+        <option value="complaint or request">Complaint / Request</option>
+      </select>
+    </div>
+  </div>
+
+  <span class="section-label">Tone</span>
+  <div class="tone-row" id="toneRow">
+    <button class="chip active" data-tone="formal">Formal</button>
+    <button class="chip" data-tone="friendly professional">Friendly Professional</button>
+    <button class="chip" data-tone="assertive">Assertive</button>
+    <button class="chip" data-tone="concise">Concise</button>
+    <button class="chip" data-tone="warm and empathetic">Warm &amp; Empathetic</button>
+  </div>
+
+  <div class="workspace">
+    <div class="panel">
+      <div class="panel-head input-head">
+        <span class="panel-label">Your Draft</span>
+        <span class="char-count" id="charCount">0 chars</span>
+      </div>
+      <textarea id="inputText" placeholder="Type or paste your message here — casual, rough, any style. It doesn't have to be perfect."></textarea>
+    </div>
+    <div class="panel">
+      <div class="panel-head output-head">
+        <span class="panel-label">Polished Version</span>
+        <span class="char-count" id="outCharCount"></span>
+      </div>
+      <div class="output-area" id="outputArea">
+        <span class="placeholder">Your professional version will appear here…</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-run" id="btnRun">✦ Polish this message</button>
+    <button class="btn-copy" id="btnCopy">Copy</button>
+  </div>
+
+  <div class="typo-banner" id="typoBanner">
+    <span class="typo-title">⚠ Typos found in your original input</span>
+    <ul class="typo-list" id="typoList"></ul>
+    <p class="typo-note">These were in your draft — always proofread your original before sending.</p>
+  </div>
+
+  <div class="explain-card" id="explainCard">
+    <span class="explain-title">What changed and why</span>
+    <ul class="explain-list" id="explainList"></ul>
+  </div>
+
+  <div class="examples">
+    <div class="examples-title">Try an example</div>
+    <div class="example-pills">
+      <button class="example-pill" data-example="followup">Following up on job application…</button>
+      <button class="example-pill" data-example="complaint">Annoyed about late delivery…</button>
+      <button class="example-pill" data-example="german">German: Termin anfragen</button>
+      <button class="example-pill" data-example="meeting">Reschedule team meeting</button>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Built by Sakthy · Studienkolleg ESKW Magdeburg · W-Kurs International Management<br>
+  <span class="footer-tag">AI Portfolio Project 1 — Business Communication Tool</span>
+</footer>
+
+<script>
+const EXAMPLES = {
+  followup: { text:"Hi, I applied for the customer service job two weeks ago and haven't heard back. Just wanted to check if you got my application and if there's any update.", inputLang:"English", outputLang:"English", context:"job application", tone:"formal" },
+  complaint: { text:"I'm really annoyed that my order still hasn't arrived. I ordered it 10 days ago and nobody is helping me. This is unacceptable and I want a refund.", inputLang:"English", outputLang:"English", context:"complaint or request", tone:"assertive" },
+  german: { text:"Ich wollte mal fragen ob ich vielleicht nächste Woche einen Termin haben kann wegen meiner Bewerbung. Ich bin ziemlich flexibel.", inputLang:"German", outputLang:"German", context:"job application", tone:"formal" },
+  meeting: { text:"Hey, can we push the meeting to Thursday? I have something come up on Wednesday and won't be able to make it.", inputLang:"English", outputLang:"English", context:"internal team", tone:"friendly professional" }
+};
+
+let selectedTone = "formal";
+let lastResult = null;
+
+// Tone chips
+document.getElementById("toneRow").addEventListener("click", e => {
+  if (!e.target.classList.contains("chip")) return;
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+  e.target.classList.add("active");
+  selectedTone = e.target.dataset.tone;
+});
+
+// Char count
+document.getElementById("inputText").addEventListener("input", function(){
+  document.getElementById("charCount").textContent = this.value.length + " chars";
+});
+
+// Ctrl+Enter shortcut
+document.getElementById("inputText").addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") runPolish();
+});
+
+// Examples
+document.querySelectorAll(".example-pill").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const ex = EXAMPLES[btn.dataset.example];
+    document.getElementById("inputText").value = ex.text;
+    document.getElementById("charCount").textContent = ex.text.length + " chars";
+    document.getElementById("inputLang").value = ex.inputLang;
+    document.getElementById("outputLang").value = ex.outputLang;
+    document.getElementById("context").value = ex.context;
+    document.querySelectorAll(".chip").forEach(c => {
+      c.classList.toggle("active", c.dataset.tone === ex.tone);
+    });
+    selectedTone = ex.tone;
+    resetOutput();
+  });
+});
+
+// Copy
+document.getElementById("btnCopy").addEventListener("click", () => {
+  if (!lastResult) return;
+  navigator.clipboard.writeText(lastResult.rewritten).then(() => {
+    const btn = document.getElementById("btnCopy");
+    btn.textContent = "Copied!";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+  });
+});
+
+function resetOutput() {
+  lastResult = null;
+  document.getElementById("outputArea").innerHTML = '<span class="placeholder">Your professional version will appear here…</span>';
+  document.getElementById("outCharCount").textContent = "";
+  document.getElementById("typoBanner").classList.remove("visible");
+  document.getElementById("explainCard").classList.remove("visible");
+  document.getElementById("btnCopy").style.display = "none";
+}
+
+async function runPolish() {
+  const input = document.getElementById("inputText").value.trim();
+  if (!input) return;
+
+  const inputLang = document.getElementById("inputLang").value;
+  const outputLang = document.getElementById("outputLang").value;
+  const context = document.getElementById("context").value;
+  const tone = selectedTone;
+
+  const btnRun = document.getElementById("btnRun");
+  const outputArea = document.getElementById("outputArea");
+
+  btnRun.disabled = true;
+  btnRun.innerHTML = '<span class="spinner"></span> Polishing…';
+  outputArea.innerHTML = '<span class="placeholder">Rewriting…</span>';
+  document.getElementById("typoBanner").classList.remove("visible");
+  document.getElementById("explainCard").classList.remove("visible");
+  document.getElementById("btnCopy").style.display = "none";
+
+  const systemPrompt = `You are a professional business communication expert specialising in workplace writing in English and German.
+
+Rewrite messages to be more professional, clear, and appropriate for the business context.
+
+Respond ONLY with a JSON object — no markdown, no preamble:
+{
+  "rewritten": "the polished version",
+  "changes": ["change 1", "change 2", "change 3"],
+  "inputTypos": ["list any typos found in the original input as 'wrong → correct'. Empty array if none."]
+}
+
+Rules:
+- Tone: ${tone}
+- Context: ${context}
+- Output language: ${outputLang === "both" ? "Provide text in BOTH English AND German. Start with EN: then on a new line DE:" : outputLang}
+- ${inputLang !== "auto" ? "Input is in " + inputLang : "Auto-detect input language"}
+- For German output: use Sie-form and standard business German phrasing
+- CRITICAL: Before returning, re-read your own rewritten text and fix any spelling errors or typos. Your output must be error-free.
+- changes: exactly 3 short bullets explaining what changed and why (educational, specific)
+- inputTypos: scan original input for typos, list as "wrong → correct". Return empty array [] if none found.`;
+
+  const userPrompt = `Context: ${context}\nTone: ${tone}\nOutput: ${outputLang}\n\nMessage:\n"""\n${input}\n"""`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || "";
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    lastResult = parsed;
+
+    // Show output
+    outputArea.textContent = parsed.rewritten;
+    document.getElementById("outCharCount").textContent = parsed.rewritten.length + " chars";
+    document.getElementById("btnCopy").style.display = "block";
+
+    // Typo banner
+    if (parsed.inputTypos && parsed.inputTypos.length > 0) {
+      const list = document.getElementById("typoList");
+      list.innerHTML = parsed.inputTypos.map(t => `<li>${t}</li>`).join("");
+      document.getElementById("typoBanner").classList.add("visible");
+    }
+
+    // Explain card
+    if (parsed.changes && parsed.changes.length > 0) {
+      const list = document.getElementById("explainList");
+      list.innerHTML = parsed.changes.map(c => `<li>${c}</li>`).join("");
+      document.getElementById("explainCard").classList.add("visible");
+    }
+
+  } catch(e) {
+    outputArea.innerHTML = '<span class="error-text">Something went wrong — please try again.</span>';
+  }
+
+  btnRun.disabled = false;
+  btnRun.innerHTML = "✦ Polish this message";
+}
+
+document.getElementById("btnRun").addEventListener("click", runPolish);
+</script>
+</body>
+</html>
+HTMLEOF
+echo "Done"
+Output
+
+Input validation errors occurred:
+description: Field required
+
+Self-contained HTML version of BusinessTone for GitHub Pages ho
